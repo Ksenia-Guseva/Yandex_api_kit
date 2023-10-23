@@ -11,17 +11,20 @@ def get_kit_body(name):
 
 def positive_assert(name):
 	kit_body = get_kit_body(name)
-	kit_response = sender_stand_request.post_new_client_kit(kit_body, sender_stand_request.auth_token)
+	kit_response = sender_stand_request.post_new_client_kit(kit_body, sender_stand_request.get_new_user_token())
 	assert kit_response.json()["name"] == name
-	print(f"\nameNewKit: {name}")
 	assert kit_response.status_code == 201
 
 def negative_assert(name):
 	kit_body = get_kit_body(name)
-	response = sender_stand_request.post_new_client_kit(kit_body, sender_stand_request.auth_token)
+	response = sender_stand_request.post_new_client_kit(kit_body, sender_stand_request.get_new_user_token())
 	assert response.status_code == 400
 	assert response.json()["code"] == 400
 	assert response.json()["message"] == "Не все необходимые параметры были переданы"
+
+def negative_assert_no_name(kit_body):
+	kit_response_negative_no_name = sender_stand_request.post_new_client_kit(kit_body)
+	assert kit_response_negative_no_name.status_code == 400
 
 #Функция для позитивной проверки Количество символов (1)
 def test_create_kit_1_symbol_in_name_get_success_response():
@@ -57,7 +60,8 @@ def test_create_kit_has_number_in_name_get_success_response():
 def test_create_kit_no_name_get_error_response():
 	current_kit_body_negative_no_name = data.kit_body.copy()
 	current_kit_body_negative_no_name.pop("name")
-	negative_assert(current_kit_body_negative_no_name)
+	negative_assert_no_name(current_kit_body_negative_no_name)
+
 # Функция для негативной проверки Передан другой тип параметра
 def test_create_kit_has_number_in_name_get_error_response():
-    negative_assert("123")
+    negative_assert(123)
